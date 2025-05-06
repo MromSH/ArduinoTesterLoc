@@ -1,0 +1,86 @@
+﻿<Window x:Class="ArduinoTester.Testing"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ArduinoTester"
+        mc:Ignorable="d"
+        Title="Testing" Height="500" Width="1000" WindowStyle="None">
+    <Grid Background="White" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="3.5*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="1.5*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBlock x:Name="NamingTextBlock" FontSize="40" FontFamily="Calibri" Margin="3,0,0,0"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <TextBlock x:Name="PortSelectorTextBlock" Text="Select COM-port" FontSize="18" Style="{StaticResource NormalTextBlock}" Margin="3,0,0,0"/>
+            </Grid>
+            <Grid Grid.Row="2">
+                <ComboBox x:Name="Ports" VerticalAlignment="Top" Height="50" Style="{DynamicResource CustomComboBox}" Margin="3,0,0,0">
+                </ComboBox>
+            </Grid>
+            <Grid Grid.Row="3">
+                <TextBlock x:Name="PlateTypeSelectorTextBlock" Text="Select type of your plate" FontSize="18" Style="{StaticResource NormalTextBlock}" Margin="3,0,0,0"/>
+            </Grid>
+            <Grid Grid.Row="4">
+                <ComboBox x:Name="PlateType" VerticalAlignment="Top" Height="50" Style="{DynamicResource CustomComboBox}" Margin="3,0,0,0"/>
+            </Grid>
+            <Grid Grid.Row="5">
+                <Button x:Name="StartButton" Height="50" Content="Start" Click="StartButton_Click" Style="{DynamicResource NormalButton}"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="1.5*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="5">
+                <Button x:Name="CloseButton" Height="50" Content="Close" Click="CloseButton_Click" Style="{DynamicResource NormalButton}"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="7*"/>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <TextBlock x:Name="DescriptiomTextBlock" FontSize="25" FontFamily="Calibri"/>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Border BorderThickness="1,1,0,0" BorderBrush="Black">
+                    <TextBlock x:Name="ConsoleLine"/>
+                </Border>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Border BorderBrush="Black" BorderThickness="1,0,0,0">
+                    <TextBox x:Name="InputString" Background="LightGray" BorderThickness="0"/>
+                </Border>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</Window>
