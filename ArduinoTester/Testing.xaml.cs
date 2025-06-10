@@ -16,6 +16,7 @@ using System.IO;
 using System.Diagnostics;
 using ArduinoTester.Properties;
 using System.IO.Ports;
+using System.Reflection;
 
 namespace ArduinoTester
 {
@@ -28,15 +29,18 @@ namespace ArduinoTester
         private short id;
 
         private string file;
+        
+        private bool fl = false;
+
+        private SerialPort serialPort;
 
         private Dictionary<string, string> plate_types = new Dictionary<string, string>()
             {
-                {"ATmega328P (Arduino Uno, Nano, Pro Mini)", "atmega328p"},
-                {"ATmega32U4 (Arduino Micro, Leonardo)", "atmega32u4" },
-                {"ATmega2560 (Arduino Mega 2560)", "atmega2560" },
-                {"ATmega1280 (Arduino Mega(старая))", "atmega1280" },
-                {"ATtiny85", "attiny85" },
-                {"ATtiny13", "attiny13" }
+                {"Uno", "uno"},
+                {"Nano", "nano" },
+                {"Nano (CH340)", "nano:cpu=atmega328old" },
+                {"Mega 2560", "mega:cpu=atmega2560" },
+                {"Leonardo", "leonardo" },
             };
 
         public short Id
@@ -72,10 +76,29 @@ namespace ArduinoTester
                 {
                     DescriptiomTextBlock.Text = cfg.description;
                     this.File = cfg.inofile;
+                    if (cfg.scheme == null)
+                    {
+                        SchemeImage.Source = new BitmapImage(new Uri("pack://application:,,,/ArduinoTester;component/static_resources/emptyPic.jpg"));
+                    } 
+                    else
+                    {
+                        using (var memoryStream = new MemoryStream(cfg.scheme))
+                        {
+                            var bitmapImage = new BitmapImage();
+                            bitmapImage.BeginInit();
+                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmapImage.StreamSource = memoryStream;
+                            bitmapImage.EndInit();
+
+                            SchemeImage.Source = bitmapImage;
+                        }
+                    }
                 }
             }
 
-            foreach (string portname in SerialPort.GetPortNames())
+            HashSet<string> av_ports = new HashSet<string>(SerialPort.GetPortNames());
+
+            foreach (string portname in av_ports)
             {
                 Ports.Items.Add(portname);
             }
@@ -94,135 +117,149 @@ namespace ArduinoTester
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
+            string selected_port = Ports.Text;
             if (string.IsNullOrEmpty(Ports.Text) || string.IsNullOrEmpty(PlateType.Text))
             {
                 MessageBox.Show("Select type of Arduino plate and COM-port", "Error", MessageBoxButton.OK);
             }
             else
             {
-                ComboBoxItem selected_plate = (ComboBoxItem)PlateType.SelectedItem;
-                string selected_plate_type = selected_plate.Content.ToString();
+                string selected_plate_type = plate_types[PlateType.Text];
 
-                ComboBoxItem selected_Port = (ComboBoxItem)Ports.SelectedItem;
-                string selected_port = selected_Port.Content.ToString();
+                string exePath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                string path = System.IO.Path.Combine(exePath, "CurrentProjRun", "CurrentProjRun.ino");
 
-                string inputFile = @"CurrentProjRun\currentProjRun.cpp";
-                string projBinFile = @"CurrentProjRun\currentProjRun.bin";
-                string projHEXFile = @"CurrentProjRun\currentProjRun.hex";
-                string compillerPath = @"sources\WinAVR-20100110\bin\avr-gcc.exe";
-                string makingHEXutilPath = @"sources\WinAVR-20100110\bin\avr-objcopy.exe";
-                string avrDudePath = @"sources\WinAVR-20100110\bin\avrdude.exe";
-                string arduinoLibs = @"sources\arduino";
-                string stdlibArduino = @"sources\avr-lib-c-main\include";
-                string ArduinoStandart = @"sources\variants\standard";
-                string additionalArgumennts = @" sources\arduino\wiring.c sources\arduino\wiring_digital.c sources\arduino\hooks.c";
+                string inputDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CurrentProjRun");
+                string arduinoCLIFullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sources", "arduino-cli_1.2.2_Windows_32bit", "arduino-cli.exe");
 
-                string path = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, inputFile);
-
-                using (StreamWriter sw = new StreamWriter(path, false, System.Text.Encoding.Default)) /// реализовать проверку успешности завершегия процесса
+                using (StreamWriter sw = new StreamWriter(path, false, System.Text.Encoding.Default))
                 {
                     sw.Write(File);
                 }
 
-                bool FLAG = true;
-                ProcessStartInfo processStartInfo1 = new ProcessStartInfo();
-                processStartInfo1.FileName = compillerPath;
-                processStartInfo1.Arguments = " -mmcu=" + selected_plate_type + " -Wall -g -Os -DF_CPU=16000000UL -o " + projBinFile + " " + inputFile + additionalArgumennts + " -I" + arduinoLibs + " -I" + ArduinoStandart + " -I" + stdlibArduino; // добавить выбор типа платы и подключать соответствующую библиотеку
-                processStartInfo1.RedirectStandardOutput = true;
-                processStartInfo1.RedirectStandardError = true;
-                processStartInfo1.UseShellExecute = false;
-                processStartInfo1.CreateNoWindow = true;
+                ProcessStartInfo processStartInfo20 = new ProcessStartInfo();
+                processStartInfo20.FileName = arduinoCLIFullPath;
+                processStartInfo20.Arguments = " compile --fqbn arduino:avr:" + selected_plate_type + " .";
+                processStartInfo20.WorkingDirectory = inputDir;
+                processStartInfo20.RedirectStandardOutput = true;
+                processStartInfo20.RedirectStandardError = true;
+                processStartInfo20.UseShellExecute = false;
+                processStartInfo20.CreateNoWindow = true;
+                processStartInfo20.StandardErrorEncoding = Encoding.Default;
 
-                Process compillingProcess = Process.Start(processStartInfo1);
+                Process compilling = Process.Start(processStartInfo20);
+                string errors1 = compilling.StandardError.ReadToEnd();
 
-                string output1 = compillingProcess.StandardOutput.ReadToEnd();
-                string errors1 = compillingProcess.StandardError.ReadToEnd();
+                string[] ers1 = errors1.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-                ConsoleLine.Text = "Output: " + output1; /// сделать вывод этого аута в консоль для компорта (если она нужна)
-                if (!string.IsNullOrEmpty(errors1))
+                string errorS1 = string.Join(Environment.NewLine, ers1.Where(line => line.IndexOf("error:", StringComparison.OrdinalIgnoreCase) >= 0));
+
+                if (!string.IsNullOrEmpty(errorS1))
                 {
-                    MessageBox.Show(errors1, "Error occured during compilation", MessageBoxButton.OK);
-                    FLAG = false;
-                }
-
-                if (FLAG)
+                    ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] (Error occured during compilation) {errorS1}");
+                    ConsoleLine.ScrollToEnd();
+                } 
+                else
                 {
-                    if (compillingProcess.ExitCode != 0)
+                    ProcessStartInfo processStartInfo21 = new ProcessStartInfo();
+                    processStartInfo21.FileName = arduinoCLIFullPath;
+                    processStartInfo21.Arguments = " upload -p " + selected_port + " --fqbn arduino:avr:" + selected_plate_type + " CurrentProjRun.ino";
+                    processStartInfo21.WorkingDirectory = inputDir;
+                    processStartInfo21.RedirectStandardOutput = true;
+                    processStartInfo21.RedirectStandardError = true;
+                    processStartInfo21.UseShellExecute = false;
+                    processStartInfo21.CreateNoWindow = true;
+                    processStartInfo21.StandardErrorEncoding = Encoding.Default;
+
+                    Process flashing = Process.Start(processStartInfo21);
+                    string errors2 = flashing.StandardError.ReadToEnd();
+
+                    string[] ers2 = errors2.Split(new[] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+
+                    string avrdudeEr = string.Join(Environment.NewLine, ers2.Where(line => line.IndexOf("avrdude:", StringComparison.OrdinalIgnoreCase) >= 0));
+                    string otherEr2 = string.Join(Environment.NewLine, ers2.Where(line => line.IndexOf("error:", StringComparison.OrdinalIgnoreCase) >= 0));
+                    if (!string.IsNullOrEmpty(avrdudeEr))
                     {
-                        MessageBox.Show("Ошибка компиляции. Код завершения: " + compillingProcess.ExitCode, "Error of compilation", MessageBoxButton.OK);
-                        FLAG = false;
+                        ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] (Error occured during flashing) {avrdudeEr}");
+                        ConsoleLine.ScrollToEnd();
                     }
-                }
-                compillingProcess.Close();
-
-
-                if (FLAG)
-                {
-                    ProcessStartInfo processStartInfo2 = new ProcessStartInfo();
-                    processStartInfo2.FileName = makingHEXutilPath;
-                    processStartInfo2.Arguments = " -j.text -j.data -O ihex " + projBinFile + " " + projHEXFile;
-                    processStartInfo2.RedirectStandardOutput = true;
-                    processStartInfo2.RedirectStandardError = true;
-                    processStartInfo2.UseShellExecute = false;
-                    processStartInfo2.CreateNoWindow = true;
-
-                    Process makingHEXProcess = Process.Start(processStartInfo2);
-
-                    string output2 = makingHEXProcess.StandardOutput.ReadToEnd();
-                    string errors2 = makingHEXProcess.StandardError.ReadToEnd();
-
-                    ConsoleLine.Text = "Output: " + output2; /// сделать вывод этого аута в консоль для компорта (если она нужна)
-                    if (!string.IsNullOrEmpty(errors2))
+                    if (!string.IsNullOrEmpty(otherEr2))
                     {
-                        MessageBox.Show(errors2, "Error occured", MessageBoxButton.OK);
-                        FLAG = false;
+                        ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] (Error occured during flashing) {otherEr2}");
+                        ConsoleLine.ScrollToEnd();
                     }
-                    else
+                    if (File.Contains("Serial.begin("))
                     {
-                        if (makingHEXProcess.ExitCode != 0)
+                        int pos = File.IndexOf("Serial.begin(");
+                        pos += 13;
+                        string spd = "";
+                        while (Char.IsDigit(File[pos]))
                         {
-                            MessageBox.Show("Ошибка создания файла. Код завершения: " + makingHEXProcess.ExitCode, "Error of file creating", MessageBoxButton.OK);
-                            FLAG = false;
+                            spd += File[pos];
+                            pos++;
                         }
+                        InitializeSerial(selected_port, int.Parse(spd));
                     }
-                    makingHEXProcess.Close();
-                }
-
-                if (FLAG)
-                {
-                    ProcessStartInfo processStartInfo3 = new ProcessStartInfo();
-                    processStartInfo3.FileName = avrDudePath;
-                    processStartInfo3.Arguments = " -p " + selected_plate_type + "-c arduino -q -D -P " + selected_port + " -U flash:w:" + projHEXFile + ":i";
-                    processStartInfo3.RedirectStandardOutput = true;
-                    processStartInfo3.RedirectStandardError = true;
-                    processStartInfo3.UseShellExecute = false;
-                    processStartInfo3.CreateNoWindow = true;
-
-                    Process boardFirmwareProcess = Process.Start(processStartInfo3);
-
-
-                    string output3 = boardFirmwareProcess.StandardOutput.ReadToEnd();
-                    string errors3 = boardFirmwareProcess.StandardError.ReadToEnd();
-
-                    Console.WriteLine(errors3);
-
-                    ConsoleLine.Text = "Output: " + output3; /// сделать вывод этого аута в консоль для компорта (если она нужна)
-                    if (!string.IsNullOrEmpty(errors3))
-                    {
-                        MessageBox.Show(errors3, "Error occured durring flashing", MessageBoxButton.OK);
-                        FLAG = false;
-                    }
-                    else
-                    {
-                        if (boardFirmwareProcess.ExitCode != 0)
-                        {
-                            MessageBox.Show("Ошибка прошивки. Код завершения: " + boardFirmwareProcess.ExitCode, "Error of flashing", MessageBoxButton.OK);
-                            FLAG = false;
-                        }
-                    }
-                    boardFirmwareProcess.Close();
                 }
             }
+        }
+        private void InitializeSerial(string selected_port, int speed)
+        {
+            serialPort = new SerialPort(selected_port, speed);
+            serialPort.DataReceived += SerialDataR;
+
+            try
+            {
+                serialPort.Open();
+                ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] Serial was opened\n");
+                fl = true;
+            }
+            catch(Exception ex) 
+            {
+                ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] Error of opening Serial: {ex.Message}\n");
+            }
+        }
+
+        private void SerialDataR(object sender, SerialDataReceivedEventArgs e)
+        {
+            string data = serialPort.ReadExisting().Trim();
+    
+            if (!string.IsNullOrEmpty(data))
+            {
+                Dispatcher.Invoke(() =>
+                    {
+                        ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] {data}\n");
+                        ConsoleLine.ScrollToEnd();
+                    }
+                );
+            }
+        }
+
+        private void SendToCOMButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (fl && !string.IsNullOrWhiteSpace(InputString.Text))
+            {
+                try
+                {
+                    serialPort.WriteLine(InputString.Text);
+                    ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] {InputString.Text}\n");
+                    InputString.Clear();
+                }
+                catch (Exception ex)
+                {
+                    ConsoleLine.AppendText($"[{DateTime.Now:HH:mm:ss}] Error of sending: {ex.Message}\n");
+                }
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if (serialPort != null && serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
+            base.OnClosed(e);
+            fl = false;
         }
     }
 }

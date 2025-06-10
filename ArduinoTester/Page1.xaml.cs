@@ -69,7 +69,6 @@ namespace ArduinoTester
             if (configuration != null)
             {
                 lstConfigs.Items.Add(configuration);
-                configuration = null;
             }
         }
 
@@ -77,8 +76,20 @@ namespace ArduinoTester
         {
             if (sender is Button button && button.DataContext is Configuration configuration)
             {
-                EditWindow editWindow = new EditWindow(configuration.id);
+                EditWindow editWindow = new EditWindow(configuration.id, this);
                 editWindow.ShowDialog();
+            }
+        }
+
+        public void Remove_cfg(short cfg_id)
+        {
+            for (int i = 0; i < lstConfigs.Items.Count; i++)
+            {
+                if (lstConfigs.Items[i] is Configuration cfg && cfg.id == cfg_id)
+                {
+                    lstConfigs.Items.RemoveAt(i);
+                    break;
+                }
             }
         }
     }

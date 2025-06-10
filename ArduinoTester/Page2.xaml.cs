@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,24 @@ namespace ArduinoTester
         public Page2()
         {
             InitializeComponent();
+
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+            string filePath = System.IO.Path.Combine(baseDir, "static_resources", "User_manual_for_program.txt");
+
+            string user_manual_text = File.ReadAllText(filePath);
+            UserManualBlock.Text = user_manual_text;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = e.Uri.AbsoluteUri,
+                UseShellExecute = true
+            });
+
+            e.Handled = true;
         }
     }
 }

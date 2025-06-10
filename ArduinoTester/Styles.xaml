@@ -58,6 +58,7 @@
         <Setter Property="FontFamily" Value="Calibri"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="FontSize" Value="25"/>
+        <Setter Property="BorderBrush" Value="Black"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -87,7 +88,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Border CornerRadius="5" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0.5">
+                    <Border CornerRadius="15" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="2">
                         <ContentPresenter/>
                     </Border>
                 </ControlTemplate>
@@ -135,7 +136,7 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Black"/>
         <Setter Property="FontFamily" Value="Calibri"/>
-        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontSize" Value="23"/>
         <Setter Property="Foreground" Value="Black"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -277,5 +278,23 @@
         <Setter Property="ItemContainerStyle" Value="{StaticResource CustomComboBoxItem}"/>
     </Style>
 
-
+    <Style x:Key="SendButton" TargetType="Button">
+        <Setter Property="Background" Value="LightGray"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0,0,0">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="White"/>
+                            <Setter Property="Foreground" Value="Black"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

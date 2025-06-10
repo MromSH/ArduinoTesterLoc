@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArduinoTester"
         mc:Ignorable="d"
-        Title="Adruino Tester" Height="450" Width="820"
-        ResizeMode="NoResize">
+        Title="Adruino Tester" Height="450" Width="840"
+        ResizeMode="NoResize"
+        Icon="/static_resources/Icon.png">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200">

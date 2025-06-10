@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace ArduinoTester
 {
@@ -25,6 +26,7 @@ namespace ArduinoTester
         AppContext database;
 
         private string FileContent;
+        private byte[] SchemePicture; 
 
         private Page1 page { get; set; }
         public AddNewConfiguration(Page1 page1)
@@ -46,21 +48,42 @@ namespace ArduinoTester
             string naming = NamingTextBox.Text.Trim();
             string description = DescriptionTextBox.Text;
             string iNOFile = FileContent;
-            string scheme = "ABC"; //поменять этот параметр
+            byte[] scheme = SchemePicture;
 
+            if (naming == null || naming == "")
+            {
+                MessageBox.Show("Give a name for your configuration", "Empty field", MessageBoxButton.OK);
+            }
+            else if (FileContent == null)
+            {
+                MessageBox.Show("Select a file for your programm", "Empty field", MessageBoxButton.OK);
+            }
+            else
+            {
+                bool fl = false;
+                database = new AppContext();
 
+                ObservableCollection<Configuration> configs = new ObservableCollection<Configuration>(database.Configurations);
 
-            /* тут будет проверка ввода данных
-             * 
-             * 
-             * 
-            */
-            Configuration configuration = new Configuration(naming, description, iNOFile, scheme);
-            database.Configurations.Add(configuration);
-            database.SaveChanges();
+                foreach(Configuration config in configs)
+                {
+                    if (naming == config.naming)
+                    {
+                        fl = true;
+                        MessageBox.Show("Such name is already existing. Choose another one", "Invalid name of configuration", MessageBoxButton.OK);
+                        break;
+                    }
+                }
+                if (!fl)
+                {
+                    Configuration configuration = new Configuration(naming, description, iNOFile, scheme);
+                    database.Configurations.Add(configuration);
+                    database.SaveChanges();
 
-            page.Refresh(configuration);
-            this.Close();
+                    page.Refresh(configuration);
+                    this.Close();
+                }
+            }
         }
 
         private void AddFileButton_Click(object sender, RoutedEventArgs e)
@@ -76,6 +99,22 @@ namespace ArduinoTester
                     FileContent = File.ReadAllText(selectedfile);
                 }
                 
+            }
+        }
+
+        private void SchemeButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Pictures (*.png, *.jpg)|*.png;*.jpg";
+            if (ofd.ShowDialog() == true)
+            {
+                string selectedfile = ofd.FileName;
+                if (File.Exists(selectedfile))
+                {
+                    SchemeTextBlock.Text = System.IO.Path.GetFileName(selectedfile);
+                    SchemePicture = File.ReadAllBytes(selectedfile);
+                    SchemeImage.Source = new BitmapImage(new Uri(selectedfile));
+                }
             }
         }
     }

@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArduinoTester"
         mc:Ignorable="d"
-        Title="Testing" Height="500" Width="1000" WindowStyle="None">
+        Title="Testing" Height="500" Width="1000" WindowStyle="None"
+        Icon="/static_resources/Icon.png">
     <Grid Background="White" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -23,7 +24,7 @@
                 <RowDefinition Height="1.5*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
-                <TextBlock x:Name="NamingTextBlock" FontSize="40" FontFamily="Calibri" Margin="3,0,0,0"/>
+                <TextBlock x:Name="NamingTextBlock" FontSize="40" FontFamily="Calibri" Margin="3,0,0,0" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
             </Grid>
             <Grid Grid.Row="1">
                 <TextBlock x:Name="PortSelectorTextBlock" Text="Select COM-port" FontSize="18" Style="{StaticResource NormalTextBlock}" Margin="3,0,0,0"/>
@@ -63,22 +64,36 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.5*"/>
-                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="1.4*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <TextBlock x:Name="DescriptiomTextBlock" FontSize="25" FontFamily="Calibri"/>
                 </Grid>
+                <Grid Grid.Column="1">
+                    <Grid>
+                        <Image x:Name="SchemeImage" Stretch="Uniform"/>
+                    </Grid>
+                </Grid>
             </Grid>
             <Grid Grid.Row="1">
                 <Border BorderThickness="1,1,0,0" BorderBrush="Black">
-                    <TextBlock x:Name="ConsoleLine"/>
+                    <TextBox x:Name="ConsoleLine" FontSize="20" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True"/>
                 </Border>
             </Grid>
             <Grid Grid.Row="2">
-                <Border BorderBrush="Black" BorderThickness="1,0,0,0">
-                    <TextBox x:Name="InputString" Background="LightGray" BorderThickness="0"/>
-                </Border>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Border BorderBrush="Black" BorderThickness="1,0,0,0">
+                        <TextBox x:Name="InputString" Background="LightGray" BorderThickness="0" FontSize="23"/>
+                    </Border>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Button x:Name="SendToCOMButton" VerticalAlignment="Top" Height="39" Content="Send" Style="{DynamicResource SendButton}" Click="SendToCOMButton_Click" Margin="0,-1,0,0"/>
+                </Grid>
             </Grid>
         </Grid>
 

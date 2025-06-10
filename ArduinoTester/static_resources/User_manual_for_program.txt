@@ -1,0 +1,19 @@
+Using this app you can test your Arduino devices and Arduino programs.
+There are few steps you have to do in order to use the app successfully:
+
+1. Make sure you have connected your Arduino plate to your computer
+2. Install drivers required for your plate
+3. Add your configuration using button "Add" in the main menu
+4. Select name for it and choose the file with your C/C++ code
+5. You could also add some description and scheme picture for your configuration
+
+There is a possibility for you to edit your configuration by pressing the button "Edit". 
+You are allowed to delete your configuration as well.
+
+To test your program:
+1. Press the button "Test" to open testing window
+2. Select your plate (take point on processor type of your plate)
+3. Select COM-port used by your plate
+4. Press the button "Start"
+
+More details: https://disk.yandex.ru/d/EKXfvSIJw6eASA

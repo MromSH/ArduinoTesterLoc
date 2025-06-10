@@ -13,12 +13,12 @@ namespace ArduinoTester
         public string naming { get; set; }
         public string description { get; set; }
         public string inofile { get; set; }
-        public string scheme { get; set; }
+        public byte[] scheme { get; set; }
         
        
         public Configuration() { }
 
-        public Configuration (string naming, string description, string iNOFile, string scheme)
+        public Configuration (string naming, string description, string iNOFile, byte[] scheme)
         {
             this.naming = naming;
             this.description = description;

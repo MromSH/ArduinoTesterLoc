@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArduinoTester"
         mc:Ignorable="d"
-        Title="AddNewConfiguration" Height="450" Width="800">
+        Title="Add new configuration" Height="450" Width="800"
+        Icon="/static_resources/Icon.png">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="6*"/>
@@ -23,7 +24,7 @@
                 <Label x:Name="NamingLabel" Content="Name your configuration" Height="43" Width="350" HorizontalAlignment="Left" FontFamily="Calibri" FontSize="30" Margin="5,0,0,0"/>
             </StackPanel>
             <StackPanel Grid.Row="1">
-                <TextBox x:Name="NamingTextBox" TextWrapping="Wrap" Height="40" Width="300" HorizontalAlignment="Left" FontWeight="Bold" Style="{StaticResource CustomTextBox}" Margin="5,0,0,0" TextAlignment="Center"/>
+                <TextBox x:Name="NamingTextBox" TextWrapping="Wrap" Height="40" Width="300" HorizontalAlignment="Left" FontWeight="Bold" Style="{StaticResource CustomTextBox}" Margin="5,0,0,0"/>
             </StackPanel>
             <StackPanel Grid.Row="2">
                 <Label x:Name="DescriptionLabel" Content="Add some description"  Height="43" Width="350" HorizontalAlignment="Left" FontFamily="Calibri" FontSize="30" Margin="5,0,0,0"/>
@@ -48,16 +49,33 @@
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="9*"/>
+                <RowDefinition Height="7.5*"/>
+                <RowDefinition Height="1.5*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0">
-                <Button x:Name="SchemeButton" Content="Scheme" Height="60" Width="150" HorizontalAlignment="Center" Margin="0,300,0,0" Style="{DynamicResource RoundedButton}"/>
-            </StackPanel>
-            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,0,-50,5">
+            <Grid Grid.Row="0">
+                <Grid>
+                    <Image x:Name="SchemeImage" Source="/static_resources/emptyPic.jpg" Stretch="Uniform"/>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <Button x:Name="SchemeButton" Content="Scheme" Height="60" Width="150" HorizontalAlignment="Left" Style="{DynamicResource RoundedButton}" Click="SchemeButton_Click"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <Border BorderThickness="0,0,0,1" BorderBrush="Black" Width="150" HorizontalAlignment="Right" Margin="0,30,5,0">
+                        <TextBlock x:Name="SchemeTextBlock" Height="25" Style="{StaticResource SimpleRow}"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+            <StackPanel Grid.Row="2" VerticalAlignment="Center" Margin="0,0,-50,5">
                 <Button x:Name="CancelButton" Content="Cancel" Height="40" Width="90" Click="CancelButton_Click" Style="{DynamicResource NormalButton}"/>
             </StackPanel>
-            <StackPanel Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,0,5">
+            <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,0,5">
                 <Button x:Name="OKButton" Content="Ok"  Height="40" Width="90" Click="OKButton_Click" Style="{DynamicResource NormalButton}"/>
             </StackPanel>
         </Grid>

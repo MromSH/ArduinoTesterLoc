@@ -11,9 +11,19 @@
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
-            <RowDefinition/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <TextBlock x:Name="NamingTextBlock" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="40">User manual</TextBlock>
-        
+        <TextBlock x:Name="UserManualBlock" Grid.Row="1" Margin="5, 5, 5, 0" FontFamily="Calibri" FontSize="15"/>
+        <TextBlock Grid.Row="2" FontFamily="Calibri" FontSize="15" Margin="5,5,5,0">
+            <Hyperlink
+                NavigateUri="https://disk.yandex.ru/d/EKXfvSIJw6eASA"
+                RequestNavigate="Hyperlink_RequestNavigate"
+                Foreground="Black"
+                >
+                For more details
+            </Hyperlink>
+        </TextBlock>
     </Grid>
 </Page>
